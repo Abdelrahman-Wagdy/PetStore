@@ -3,6 +3,10 @@
        parallel="methods"
        thread-count="5">
 
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+
     <test name="CRUD">
         <classes>
             <class name="usertests.UserTests"/>

@@ -9,4 +9,4 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
-CMD ["sh", "-c", "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testng.xml -DforkCount=1 -DreuseForks=true && mvn allure:report"]
+CMD ["sh", "-c", "mvn clean test -Dmaven.test.failure.ignore=true allure:report"]
