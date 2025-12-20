@@ -24,7 +24,7 @@ public class UserTests {
                 .build();
     }
 
-    @DataProvider(name = "users")
+    @DataProvider(name = "users", parallel = true)
     public Object[][] userData() {
         return new Object[][] {
                 { new UserTestData("abdelrahman","wagdy","a@b.com","password","awagdy","001122334455",10,2) },
