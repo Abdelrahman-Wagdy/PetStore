@@ -9,4 +9,4 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
-CMD ["sh", "-c", "mvn clean test -Dmaven.test.failure.ignore=true allure:report"]
+CMD ["sh", "-c", "mvn test -Dmaven.test.failure.ignore=true"]
