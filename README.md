@@ -6,6 +6,20 @@ The framework automates **CRUD operations** on the **User endpoints** of the Swa
 
 It is designed to showcase **real-world automation and CI practices**, not just local test execution.
 
+## 🧠 Design Decisions
+
+- Docker is used to ensure consistent execution across local and CI environments.
+- Jenkins marks builds as UNSTABLE when tests fail to allow report generation.
+- Allure is used for rich reporting instead of plain surefire logs.
+- Email notifications are enabled to close the CI feedback loop.
+
+## 🎯 Problems This Project Solves
+
+- Eliminates environment-related test failures
+- Provides immediate visibility into API test results
+- Enables CI feedback via reports and email notifications
+- Demonstrates scalable API test architecture
+
 ## 🛠 Tech Stack
 
 * Java 18 or higher
@@ -118,3 +132,12 @@ The project includes a **Jenkins pipeline** that performs the following steps:
 ## 🎥 CI Execution Demo
 
 [▶️ Watch Jenkins + Docker + Allure demo](docs/demo.mp4)
+
+---
+### 👤 Author
+
+**Abdelrahman Wagdy**
+
+_Senior QA Automation Engineer_
+
+_API Automation • CI/CD • Docker • Jenkins • Allure_
