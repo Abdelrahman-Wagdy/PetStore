@@ -36,6 +36,42 @@ allure serve docker-test-output/allure-results
 
 Use a different container name for simultaneous local runs.
 
+## Publish to Docker Hub
+
+The commands below use `abdelrahmanawagdy/petstoreapi`, the Docker Hub repository previously documented for this project. Publishing requires write access to that repository; use your own namespace if publishing a fork.
+
+From the project root, pull the latest source and rebuild before publishing. An existing image does not automatically include source or Dockerfile changes:
+
+```bash
+git switch main
+git pull --ff-only
+docker build -t petstore-tests:latest .
+docker run --rm petstore-tests:latest
+```
+
+Review the test result before publishing. This quick run removes its container, including reports; use the named-container workflow above if you need to retain them.
+
+Log in, tag the rebuilt image, and push:
+
+```bash
+docker login
+docker tag petstore-tests:latest abdelrahmanawagdy/petstoreapi:latest
+docker push abdelrahmanawagdy/petstoreapi:latest
+```
+
+`petstore-tests:latest` is the local image tag. `abdelrahmanawagdy/petstoreapi:latest` is its Docker Hub destination. Pushing updates the remote `latest` tag; it does not update images already downloaded on other machines.
+
+## Pull and run the published image
+
+After the image has been published, download it on the target machine:
+
+```bash
+docker pull abdelrahmanawagdy/petstoreapi:latest
+docker run --rm abdelrahmanawagdy/petstoreapi:latest
+```
+
+For retained reports, replace `--rm` with `--name petstore-local` and follow the report-copy commands in **Run with Docker**.
+
 ## Reports and CI
 
 Local Allure results are written to `target/allure-results`; Surefire reports are in `target/surefire-reports`.
