@@ -4,7 +4,7 @@ pipeline {
     options { disableConcurrentBuilds() }
 
     environment {
-        IMAGE_NAME = "petstore-api-tests"
+        IMAGE_NAME = "petstore-tests"
         ALLURE_RESULTS = "allure-results"
         ALLURE_REPORT = "allure-report"
     }
