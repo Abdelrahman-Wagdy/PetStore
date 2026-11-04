@@ -1,143 +1,78 @@
-# PetStore API Testing Project
+# PetStore API Automation
 
-## Overview
+Java API automation for the Swagger Petstore v3 user endpoints, using REST Assured, TestNG, Docker, Jenkins, and Allure. This portfolio project demonstrates a service layer, model builders, data-driven tests, and CI reporting.
 
-The framework automates **CRUD operations** on the **User endpoints** of the Swagger PetStore API.
+## Requirements
 
-It is designed to showcase **real-world automation and CI practices**, not just local test execution.
+- JDK 21 and Maven 3.9 recommended for local execution; the POM targets Java 21.
+- Network access to Maven dependencies and `petstore3.swagger.io`.
+- Docker for container execution. Local Java/Maven installation is not needed for that route.
+- Allure CLI to view results locally.
 
-## 🧠 Design Decisions
+## Run locally
 
-- Docker is used to ensure consistent execution across local and CI environments.
-- Jenkins marks builds as UNSTABLE when tests fail to allow report generation.
-- Allure is used for rich reporting instead of plain surefire logs.
-- Email notifications are enabled to close the CI feedback loop.
-
-## 🎯 Problems This Project Solves
-
-- Eliminates environment-related test failures
-- Provides immediate visibility into API test results
-- Enables CI feedback via reports and email notifications
-- Demonstrates scalable API test architecture
-
-## 🛠 Tech Stack
-
-* Java 18 or higher
-* Maven 3.6 or higher
-* REST Assured
-* Jenkins
-* Docker (optional, for containerized execution)
-* Allure report
-* Gmail SMTP (Email Notifications)
-
-## 📂 Project layout
-
-```
-PetStore/
-├── src/
-│   ├── main/
-│   │   └── java/
-│   │       ├── models/
-│   │       │   └── UserModel.java
-│   │       ├── services/
-│   │       │   └── UserServices.java
-│   │       └── utils/
-│   │           └── Config.java
-│   └── test/
-│       ├── java/
-│       │   └── usertests/
-│       │       └── UserTests.java
-│       └── resources/
-│           ├── endpoints.properties
-│           └── testng.xml
-├── pom.xml
-├── Dockerfile
-├── Jenkinsfile
-└── docs/
-│   ├── screenshots/
-│   │   ├── email-notification.png
-│   │   ├── allure-overview.png
-│   │   └── jenkins-console.png
-│   └── PetStore API demo.mp4
-...
-```
-
-## Dependencies
-
-The project uses the following main dependencies:
-
-- TestNG - Test framework
-- RestAssured - API testing library
-- Gson - JSON serialization/deserialization
-- AssertJ - Fluent assertions
-- JavaTuples - Tuple data structures
-- Allure - Test reporting
-
-## 🚀 Getting started
-### Running Tests Locally
-
-#### 1. Clone the repository
-
-Run:
 ```bash
 git clone https://github.com/Abdelrahman-Wagdy/PetStore.git
 cd PetStore
-mvn clean test 
+mvn clean test
 ```
-### Running Tests using Docker
+
+Endpoint configuration is in `src/test/resources/endpoints.properties`. `base.url` contains the host and path without `https://`; the service adds that prefix.
+
+## Run with Docker
+
 ```bash
-docker build -t petstore-api-tests .
-docker run --rm petstore-api-tests
+docker build -t petstore-tests .
+docker run --name petstore-local petstore-tests
 ```
-**OR**
 
-#### 1. Clone the docker repo
+The container exits nonzero when Maven fails. Keep the stopped container long enough to collect reports, including after a failing run:
+
 ```bash
-docker pull abdelrahmanawagdy/petstoreapi:latest
+docker cp petstore-local:/app/target ./docker-test-output
+docker rm petstore-local
+allure serve docker-test-output/allure-results
 ```
-#### 2. Run the docker image in a container
+
+Use a different container name for simultaneous local runs.
+
+## Reports and CI
+
+Local Allure results are written to `target/allure-results`; Surefire reports are in `target/surefire-reports`.
+
 ```bash
-docker run -d --name myapp-container abdelrahmanawagdy/petstoreapi:latest
+allure serve target/allure-results
 ```
-## ⚙️ CI/CD Pipeline (Jenkins)
 
-The project includes a **Jenkins pipeline** that performs the following steps:
-1. Checkout source code
-2. Build Docker image
-3. Execute API tests inside Docker
-4. Generate Allure results
-5. Publish Allure HTML report
-6. Send email notification with report link
+The Jenkins pipeline checks out the configured SCM, builds the Docker image, runs tests, extracts Allure results, publishes the report, and removes the container. A nonzero test process marks the build **FAILED** while allowing the reporting stages to continue. Report extraction failures also fail the build.
 
----
+Jenkins requires a Unix agent with Docker access, the Allure plugin and configured command-line installation, and Email Extension with SMTP configured. Review the recipient in `Jenkinsfile` before running it. Concurrent builds of the same job are disabled.
 
-## 📊 CI Pipeline
+## Code map
 
-![Jenkins Console](docs/screenshots/Jenkins-console.png)
+| Location | Responsibility |
+| --- | --- |
+| `src/main/java/models/` | User model, builder, and test-data objects |
+| `src/main/java/services/UserServices.java` | HTTP requests for user operations |
+| `src/main/java/utils/Config.java` | Endpoint configuration |
+| `src/test/java/usertests/UserTests.java` | User creation, read, update, deletion, login, and logout checks |
+| `src/test/resources/testng.xml` | TestNG suite |
+| `Dockerfile` / `Jenkinsfile` | Container execution and CI |
 
----
+## Current limitations and next improvements
 
-## 📈 Allure Report
+- Tests use fixed users and depend on shared state and ordering. Read and delete cases currently share a priority, so this is not yet an isolated or repeatable suite.
+- Some negative assertions only check for a non-200 response. Replace them with contract-specific status and response checks after confirming the target API's behavior.
+- The public demo service may not enforce realistic authentication rules. Login-related expectations need to be checked against its contract rather than assumed from production systems.
+- Next: unique data per test, explicit setup/cleanup, independent CRUD tests, and a controlled local API for deterministic CI.
+- The suite performs functional checks, not load testing. Do not use the public demo as a performance-test target.
 
-![Allure Overview](docs/screenshots/allure-overview.png)
+## Existing demonstration material
 
----
+These screenshots and video illustrate earlier runs; they are not evidence that the current revision passed.
 
-## 📧 Email Notification
+![Jenkins console](docs/screenshots/Jenkins-console.png)
+![Allure overview](docs/screenshots/allure-overview.png)
+![Email notification](docs/screenshots/email_notification.png)
 
-![Email Notification](docs/screenshots/email_notification.png)
-
----
-
-## 🎥 CI Execution Demo
-
-[▶️ Watch Jenkins + Docker + Allure demo](docs/demo.mp4)
-
----
-### 👤 Author
-
-**Abdelrahman Wagdy**
-
-_Senior QA Automation Engineer_
-
-_API Automation • CI/CD • Docker • Jenkins • Allure_
+[Watch the Jenkins, Docker, and Allure demonstration](docs/demo.mp4)

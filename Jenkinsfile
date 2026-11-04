@@ -1,9 +1,10 @@
 pipeline {
     agent any
 
+    options { disableConcurrentBuilds() }
+
     environment {
-        IMAGE_NAME = "petstore-api-tests"
-        CONTAINER_NAME = "petstore-tests"
+        IMAGE_NAME = "petstore-tests"
         ALLURE_RESULTS = "allure-results"
         ALLURE_REPORT = "allure-report"
     }
@@ -12,6 +13,9 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                script {
+                    env.CONTAINER_NAME = "petstore-" + env.BUILD_TAG.replaceAll("[^a-zA-Z0-9_.-]", "-")
+                }
                 checkout scm
             }
         }
@@ -24,17 +28,18 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh """
-                docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} || true
-                """
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    sh 'docker run --name "$CONTAINER_NAME" "$IMAGE_NAME"'
+                }
             }
         }
 
         stage('Extract Allure Results') {
             steps {
                 sh """
+                rm -rf ${ALLURE_RESULTS}
                 mkdir -p ${ALLURE_RESULTS}
-                docker cp ${CONTAINER_NAME}:/app/target/allure-results ./${ALLURE_RESULTS}
+                docker cp ${CONTAINER_NAME}:/app/target/allure-results/. ./${ALLURE_RESULTS}
                 """
             }
         }
@@ -75,3 +80,4 @@ pipeline {
         }
     }
 }
+

@@ -9,4 +9,5 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
-CMD ["sh", "-c", "mvn test -Dmaven.test.failure.ignore=true"]
+CMD ["mvn", "-B", "test"]
+
