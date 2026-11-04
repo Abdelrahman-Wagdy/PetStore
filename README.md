@@ -22,8 +22,8 @@ Endpoint configuration is in `src/test/resources/endpoints.properties`. `base.ur
 ## Run with Docker
 
 ```bash
-docker build -t petstore-api-tests .
-docker run --name petstore-local petstore-api-tests
+docker build -t petstore-tests .
+docker run --name petstore-local petstore-tests
 ```
 
 The container exits nonzero when Maven fails. Keep the stopped container long enough to collect reports, including after a failing run:
